@@ -1,5 +1,10 @@
 from itertools import product
+from utils import *
+import string
 import sys
+import time
+import matplotlib.pyplot as plt
+import numpy as np
 
 hamming_dist_dict = {}
 
@@ -50,10 +55,6 @@ def closest_string_brute_force(strings):
     
     # print("global shd:" + str(global_smallest_hamming_dist))
     closest_string = {i for i in hamming_dist_dict if hamming_dist_dict[i]==global_smallest_hamming_dist}
-    for key, value in hamming_dist_dict.items():
-        if value == global_smallest_hamming_dist:
-            print(key, value)
-
     filtered_array = []
     closest_strings = list(closest_string)
     # print("closest strings: " + str(closest_string))
@@ -101,19 +102,52 @@ def closest_string_brute_force(strings):
         
         if count == global_smallest_count:
             final_arr.append(filtered_string)
-            # print(filtered_string, hamming_dist_arr, count)
+            #print(filtered_string, hamming_dist_arr)
         
     
-    print(final_arr)
     return final_arr
-    #return the string with the lowest hamming_distances (median)
     
 
-strings = ["cata", "cota", "sstb", "bnas", "bgat"]
+#strings = ["cata", "cota", "sstb", "bnas", "bgat"]
 #strings = ["asdb", "axty", "asza"]
 
-closest_strings = closest_string_brute_force(strings)
-# print(closest_strings)
 
 
+alphabet = string.ascii_lowercase
 
+number_of_strings = 1
+number_of_strings_arr = []
+strings_arr = []
+closest_string_final_arr = []
+closest_string_arr = []
+time_arr = []
+print("wait...")
+for i in range(10):
+    start = time.time()
+    closest_string_arr.clear()
+    number_of_strings_arr.append(number_of_strings)
+    strings = generate_random_strings(number_of_strings, 5, alphabet)
+    strings_arr.append(strings)
+    closest_strings = closest_string_brute_force(strings)
+    closest_string_arr.append(closest_strings)
+    closest_string_final_arr.append(closest_string_arr)
+    #print(closest_strings)
+
+    end = time.time()
+    length = end - start
+    time_arr.append(length)
+    number_of_strings += 1
+
+print("number_of_strings_arr: " + str(number_of_strings_arr))
+print("time_arr: " + str(time_arr))
+print("strings_arr: " + str(strings_arr))
+print("closest_strings: " + str(closest_string_final_arr))
+xpoints = number_of_strings_arr
+ypoints = time_arr
+
+plt.figure(num=0, dpi=120)
+plt.title("Time / strings")
+plt.xlabel("Number of strings")
+plt.ylabel("Time in seconds")
+plt.plot(xpoints, ypoints)
+plt.show()
