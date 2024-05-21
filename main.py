@@ -1,8 +1,6 @@
 from itertools import product
-import string
 import sys
 
-alphabet = string.ascii_lowercase  # 'abcdefghijklmnopqrstuvwxyz'
 hamming_dist_dict = {}
 
 def hamming_dist(string1, string2):
@@ -12,67 +10,110 @@ def hamming_dist(string1, string2):
             count += 1
     return count
 
+letters = []
 
 def closest_string_brute_force(strings):
+    count = 0
+    for i in range(len(strings[0])):
+        for string in strings:
+            if string[i] not in letters:
+                letters.append(string[i])
+
     m = len(strings[0])
     # Generate the Cartesian product
-    permutations = product(alphabet, repeat=m)
+    permutations = product(letters, repeat=m)
     
-    smallest_max_hamming_dist = sys.maxsize
     hamming_dist_arr = []
     # Print the permutations
-    for p in permutations:
-        hamming_dist_arr.clear() #!!!!!!!!!!!!!!!
 
+    global_smallest_hamming_dist = sys.maxsize
+    for p in permutations:
+        highest_hamming_dist = 0
+        hamming_dist_arr.clear() #!!!!!!!!!!!!!!!
         bf_string = ''.join(p)
-        # print(bf_string)
-        max_hamming_dist = 0
 
         for string in strings:
             hamming_dist_arr.append(hamming_dist(string, bf_string))
-            if(string == bf_string):
-                continue
-            
 
+        #get the highest_hamming_dist in the array
         for i in hamming_dist_arr:
-            if max_hamming_dist < i:
-                max_hamming_dist = i
+            if highest_hamming_dist < i:
+                highest_hamming_dist = i
+        
+        # print("highest hamming dist: " + str(highest_hamming_dist))
+        #update global
+        if highest_hamming_dist < global_smallest_hamming_dist:
+            global_smallest_hamming_dist = highest_hamming_dist
+
+        # populate the dict
+        hamming_dist_dict[bf_string] = highest_hamming_dist
+    
+    # print("global shd:" + str(global_smallest_hamming_dist))
+    closest_string = {i for i in hamming_dist_dict if hamming_dist_dict[i]==global_smallest_hamming_dist}
+    for key, value in hamming_dist_dict.items():
+        if value == global_smallest_hamming_dist:
+            print(key, value)
+
+    filtered_array = []
+    closest_strings = list(closest_string)
+    # print("closest strings: " + str(closest_string))
+
+    hamming_dist_arr = []
+    for closest_string in closest_strings:
+        hamming_dist_arr.clear()
+        for string in strings:
+            hamming_dist_arr.append(hamming_dist(closest_string, string))
+        
+        not_a_good_string = False
+        for value in hamming_dist_arr:
+            if value > global_smallest_hamming_dist or value == 0:
+                not_a_good_string = True
             
-            if max_hamming_dist == 0:
-                print("string: " + bf_string)
+        if not not_a_good_string:
+            filtered_array.append(closest_string)
 
-                print("max_hamming_dist: " + str(max_hamming_dist))
+    global_smallest_count = sys.maxsize
+    for filtered_string in filtered_array:
+        count = 0
+        hamming_dist_arr.clear()
+        for string in strings:
+            hamming_dist_arr.append(hamming_dist(filtered_string, string))
+        
+        for value in hamming_dist_arr:
+            if value == global_smallest_hamming_dist:
+                count += 1
 
-            if max_hamming_dist < smallest_max_hamming_dist:
-                smallest_max_hamming_dist = max_hamming_dist
+        if count < global_smallest_count:
+            global_smallest_count = count
+        
+        # print(filtered_string, hamming_dist_arr, count)
 
-        if bf_string == "cstb":
-            print(max_hamming_dist)
-            print(smallest_max_hamming_dist)
-            print(hamming_dist_arr)
-            print("smallest_max_hamming_dist: " + str(smallest_max_hamming_dist))
-            return
+    final_arr = []
 
-        hamming_dist_dict[bf_string] = max_hamming_dist
-        #
-
-    #print(hamming_dist_dict)
-    # for key, value in hamming_dist_dict.items():
-    #     if value == 2:
-    #         print(key, value)
-    closest_string = {i for i in hamming_dist_dict if hamming_dist_dict[i]==2}
-
-    return closest_string
+    for filtered_string in filtered_array:
+        count = 0
+        hamming_dist_arr.clear()
+        for string in strings:
+            hamming_dist_arr.append(hamming_dist(filtered_string, string))
+        for value in hamming_dist_arr:
+            if value == global_smallest_hamming_dist:
+                count += 1
+        
+        if count == global_smallest_count:
+            final_arr.append(filtered_string)
+            # print(filtered_string, hamming_dist_arr, count)
+        
+    
+    print(final_arr)
+    return final_arr
     #return the string with the lowest hamming_distances (median)
     
-strings = ["cata", "cota", "sstb"]
+
+strings = ["cata", "cota", "sstb", "bnas", "bgat"]
 #strings = ["asdb", "axty", "asza"]
-#TODO: filter closest_string by the minimum 'k'
 
-
-closest_string = closest_string_brute_force(strings)
-#print(closest_string)
-
+closest_strings = closest_string_brute_force(strings)
+# print(closest_strings)
 
 
 
